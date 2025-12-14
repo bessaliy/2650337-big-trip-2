@@ -34,7 +34,9 @@ function createOfferListTemplate(offers, checkedOffersId) {
 function createPhotosTemplate(pictures) {
   return pictures.length > 0 ?
     `<div class="event__photos-tape">
-      ${pictures.map(({ src, description }) => `<img class="event__photo" src=${src} alt=${description}`)}>
+ ${pictures.map(({ src, description }) =>
+    `<img class="event__photo" src="${src}" alt="${description}">`
+  ).join('')}
     </div>`
     : '';
 }
@@ -43,7 +45,12 @@ function createDescriptionTemplate(description) {
 }
 
 function createNewFormTemplate(point, offers, destination) {
-  const { id, basePrice, dateFrom, dateTo, offers: checkedOffersId, type } = point;
+  const { id,
+    'base_price': basePrice,
+    'date_from': dateFrom,
+    'date_to': dateTo,
+    offers: checkedOffersId,
+    type } = point;
   const { name, description, pictures } = destination;
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">

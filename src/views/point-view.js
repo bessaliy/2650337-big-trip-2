@@ -2,18 +2,28 @@ import { createElement } from '../render.js';
 import { humanizeTaskDueDate, getDifferenceInTime } from '../utils.js';
 import { DATE_FORMAT} from '../const.js';
 
-function createOffersTemplate() {
-  return Object.keys(offers).length > 0 ?
-    `<li class="event__offer">
-        <span class="event__offer-title">${offers.title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offers.price}</span>
-      </li>`
-    : '';
-}
+function createOffersTemplate(offer) {
+  if (!offer) {
+    return '';
+  }
 
+  return `
+    <li class="event__offer">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+    </li>
+  `;
+}
 function createPointTemplate(point, offers, destination) {
-  const { basePrice, dateFrom, dateTo, isFavorite, type } = point;
+  const {
+    'base_price': basePrice,
+    'date_from': dateFrom,
+    'date_to': dateTo,
+    'is_favorite': isFavorite,
+    type
+  } = point;
+
   const { name } = destination;
   return `<li class="trip-events__item">
   <div class="event">
@@ -35,7 +45,7 @@ function createPointTemplate(point, offers, destination) {
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-      ${offers.offers.map((offer) => createOffersTemplate(offer)).join('')}
+       ${offers.offers.map(createOffersTemplate).join('')}
     </ul>
     <button class="event__favorite-btn  ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
       <span class="visually-hidden">Add to favorite</span>

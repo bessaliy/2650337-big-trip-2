@@ -1,9 +1,20 @@
 import {getRandomInteger, getRandomId, getRandomArrayElement} from '../utils.js';
-import {CITIES, DESCRIPTIONS, DESCRIPTIONS_AMOUNT, PHOTOS_DESCRIPTIONS} from '../const.js';
+import {CITIES, DESCRIPTIONS, DESCRIPTIONS_AMOUNT, IMAGES_AMOUNT, PHOTOS_DESCRIPTIONS} from '../const.js';
 const citiesList = [...CITIES];
 const destinationsId = [];
 
 const mockDestinations = [];
+function getImages(name) {
+  const images = [];
+  for(let i = 0; i < (getRandomInteger(1, IMAGES_AMOUNT)); i++) {
+    const image = {
+      'src': `https://loremflickr.com/248/152?random=${getRandomInteger(1, 1000)}`,
+      'description': name + getRandomArrayElement(PHOTOS_DESCRIPTIONS).toString()
+    };
+    images.push(image);
+  }
+  return images;
+}
 
 function getDestination() {
   const name = getRandomArrayElement(citiesList);
@@ -17,12 +28,7 @@ function getDestination() {
     'id': destinationID,
     'description': getRandomArrayElement(DESCRIPTIONS),
     'name': name,
-    'pictures': [
-      {
-        'src': `https://loremflickr.com/248/152?random=${getRandomInteger(1, 100)}`,
-        'description': name + getRandomArrayElement(PHOTOS_DESCRIPTIONS).toString()
-      }
-    ]
+    'pictures': getImages(name)
   };
 }
 

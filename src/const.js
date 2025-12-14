@@ -14,7 +14,7 @@ export const PHOTOS_DESCRIPTIONS = [
   ' ancient cemetery is where the mist never fully dissipates, guarding secrets in a perpetual, gentle shroud.',
   ' grand opera house’s highest balcony seat is always cold to the touch, no matter the season',
   ' forgotten subway station, sealed behind a brick wall, sometimes echoes with the sound of a phantom train\'s departure.',
-  ' iron bridge casts a shadow that, at a certain moon phase, points not to the water, but to a door in the cliffside.',
+  ' iron bridge casts a shadow that, at a certain moon phase, points not to the water, but to a door in the cliff-side.',
   '’s oldest bookstore has a section that rearranges itself nightly, guiding readers to books they didn\'t know they needed.',
   '’s central park specific lamppost flickers in a pattern that some claim is a message in morse code.',
   '’s gargoyle on the cathedral\'s north tower is said to occasionally turn its head to watch specific passersby below',
@@ -24,6 +24,7 @@ export const PHOTOS_DESCRIPTIONS = [
   '’s main square statue of the founder collects no pigeon droppings, a fact both charming and inexplicable to locals',
   '’s carousel in the riverside fairground has one horse that is never used, yet its paint remains fresh and its saddle warm'
 ];
+export const IMAGES_AMOUNT = 5;
 export const DESCRIPTIONS_AMOUNT = 8;
 export const PRICE = {
   MIN: 1,
