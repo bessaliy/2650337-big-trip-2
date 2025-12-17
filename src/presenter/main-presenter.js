@@ -7,7 +7,6 @@ import FiltersView from '../views/filters-view';
 
 import { render } from '../render.js';
 
-
 export default class MainPresenter {
   sortComponent = new SortView();
   listComponent = new EventsListView();
