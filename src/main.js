@@ -1,13 +1,16 @@
-import BoardPresenter from './presenter/board-presenter.js';
+import MainPresenter from './presenter/main-presenter.js';
+import PointModel from './model/point-model.js';
 
-const header = document.querySelector('.page-header');
-const headerContainer = header.querySelector('.trip-controls__filters');
+const headerContainer = document.querySelector('.trip-controls__filters');
 
 const main = document.querySelector('.page-main');
 const mainContainer = main.querySelector('.page-body__container');
+// const mainContainer = main.querySelector('.trip-events');
+const pointModel = new PointModel();
 
-const boardPresenter = new BoardPresenter({
+const mainPresenter = new MainPresenter({
   headerContainer: headerContainer,
-  container: mainContainer });
+  mainContainer: mainContainer,
+  pointModel: pointModel });
 
-boardPresenter.init();
+mainPresenter.init();
