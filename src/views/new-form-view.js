@@ -1,7 +1,7 @@
-import { createElement } from '../render.js';
 import { pointTypes, DATE_FORMAT} from '../const.js';
 import { humanizePointDueDate, capitalizeString } from '../utils.js';
 import { destinationsAll } from '../mock/points.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 
 function createTypeItemTemplate(id, pointType, checkedType) {
@@ -117,25 +117,36 @@ function createNewFormTemplate(point, offers, destination) {
             </form >
           </li > `;
 }
-export default class NewFormView {
-  constructor({ point, offers, destination}) {
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
+export default class NewFormView extends AbstractView {
+  #point = null;
+  #offers = null;
+  #destination = null;
+  #handleSubmit = null;
+  #handleClose = null;
+  constructor({ point, offers, destination, onSubmit, onClose}) {
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#handleSubmit = onSubmit;
+    this.#handleClose = onClose;
+    this.element.querySelector('form')
+      .addEventListener('submit', this.#submitHandler);
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#closeHandler);
   }
 
-  getTemplate() {
-    return createNewFormTemplate(this.point, this.offers, this.destination);
+  get template() {
+    return createNewFormTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
+  #submitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleSubmit?.();
+  };
 
-  removeElement() {
-    this.element = null;
-  }
+  #closeHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClose?.();
+  };
 }
