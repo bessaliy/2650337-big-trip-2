@@ -1,6 +1,5 @@
 import { pointTypes, DATE_FORMAT} from '../const.js';
 import { humanizePointDueDate, capitalizeString } from '../utils.js';
-import { destinationsAll } from '../mock/points.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 
@@ -46,7 +45,7 @@ function createDescriptionTemplate(description) {
   return description.length > 0 ? `<p class="event__destination-description">${description}</p>` : '';
 }
 
-function createNewFormTemplate(point, offers, destination) {
+function createNewFormTemplate(point, offers, destination, destinations) {
   const { id,
     'base_price': basePrice,
     'date_from': dateFrom,
@@ -78,7 +77,7 @@ function createNewFormTemplate(point, offers, destination) {
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${name}" list="destination-list-${id}">
                     <datalist id="destination-list-${id}">
-                    ${destinationsAll.map((destinationItem) => `<option value='${destinationItem.name}'></option>`).join('')}
+                    ${destinations.map((destinationItem) => `<option value='${destinationItem.name}'></option>`).join('')}
                     </datalist>
                   </div>
 
@@ -121,15 +120,17 @@ export default class NewFormView extends AbstractView {
   #point = null;
   #offers = null;
   #destination = null;
-  #handleSubmit = null;
-  #handleClose = null;
-  constructor({ point, offers, destination, onSubmit, onClose}) {
+  #destinations;
+  #handleSubmit;
+  #handleClose;
+  constructor({ point, offers, destination, onSubmit, onClose, destinations}) {
     super();
     this.#point = point;
     this.#offers = offers;
     this.#destination = destination;
     this.#handleSubmit = onSubmit;
     this.#handleClose = onClose;
+    this.#destinations = destinations;
     this.element.querySelector('form')
       .addEventListener('submit', this.#submitHandler);
     this.element.querySelector('.event__rollup-btn')
@@ -137,16 +138,16 @@ export default class NewFormView extends AbstractView {
   }
 
   get template() {
-    return createNewFormTemplate(this.#point, this.#offers, this.#destination);
+    return createNewFormTemplate(this.#point, this.#offers, this.#destination, this.#destinations);
   }
 
   #submitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleSubmit?.();
+    this.#handleSubmit();
   };
 
   #closeHandler = (evt) => {
     evt.preventDefault();
-    this.#handleClose?.();
+    this.#handleClose();
   };
 }
