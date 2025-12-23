@@ -1,22 +1,26 @@
 import {POINTS_AMOUNT} from '../mock/mock-const.js';
-import { getPoint, destinationsAll, offersByType} from '../mock/points.js';
+import { getPoint, allDestinations, offersByType} from '../mock/points.js';
 import { generateFilter } from '../utils.js';
 
 export default class PointModel {
-  points = Array.from({ length: POINTS_AMOUNT }, getPoint);
-  offers = offersByType;
-  destinations = destinationsAll;
+  #points = Array.from({ length: POINTS_AMOUNT }, getPoint);
+  #offers = offersByType;
+  #destinations = allDestinations;
 
   getPoints() {
-    return this.points;
+    return this.#points;
   }
 
   getOffersByType(type) {
-    return this.offers.find((offer) => offer.type === type);
+    return this.#offers.find((offer) => offer.type === type);
+  }
+
+  getDestinations() {
+    return this.#destinations;
   }
 
   getDestinationById(id) {
-    return this.destinations.find((destination) => destination.id === id);
+    return this.#destinations.find((destination) => destination.id === id);
   }
 
   getFilters() {

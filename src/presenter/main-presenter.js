@@ -6,14 +6,17 @@ import FiltersView from '../views/filters-view.js';
 import EmptyListView from '../views/empty-list-view.js';
 
 import { render, replace } from '../framework/render.js';
+import { SORT_ITEMS, FILTER_TYPES, EMPTY_MESSAGES } from '../const.js';
 
+const currentFilterType = FILTER_TYPES.EVERYTHING;
+const defaultMessage = EMPTY_MESSAGES.EVERYTHING;
 export default class MainPresenter {
-  sortComponent = new SortView();
   listComponent = new EventsListView();
   #pointComponents = new Map();
   #formComponents = new Map();
   #currentFormId = null;
   #escKeydownHandler = null;
+  #emptyMessage = defaultMessage;
 
   constructor({ filterElement, tripElement, pointModel }) {
     this.filterElement = filterElement;
@@ -25,16 +28,15 @@ export default class MainPresenter {
     this.points = [...this.pointModel.getPoints()];
 
     if (this.points.length === 0) {
-      render(new EmptyListView(), this.tripElement);
+      render(new EmptyListView(this.#emptyMessage), this.tripElement);
       return;
     }
     const filters = this.pointModel.getFilters();
 
-    const currentFilterType = 'everything';
-
     render(new FiltersView({ filters, currentFilterType }), this.filterElement);
 
-    render(this.sortComponent, this.tripElement);
+    render(new SortView(SORT_ITEMS), this.tripElement);
+
     render(this.listComponent, this.tripElement);
 
     for (let i = 0; i < this.points.length; i++) {
@@ -44,10 +46,10 @@ export default class MainPresenter {
 
   #renderPoint(point) {
     const pointComponent = new PointView({
-      point: point,
+      point,
       destination: this.pointModel.getDestinationById(point.destination),
       offers: this.pointModel.getOffersByType(point.type),
-      onArrowClick: () => this.#replacePointToForm(point.id)
+      onOpenClick: () => this.#replacePointToForm(point.id),
     });
 
     this.#pointComponents.set(point.id, pointComponent);
@@ -63,7 +65,7 @@ export default class MainPresenter {
     }
 
     const formComponent = new NewFormView({
-      point: point,
+      point,
       destination: this.pointModel.getDestinationById(point.destination),
       offers: this.pointModel.getOffersByType(point.type),
       onSubmit: () => {
@@ -71,7 +73,8 @@ export default class MainPresenter {
       },
       onClose: () => {
         this.#replaceFormToPoint(pointId);
-      }
+      },
+      destinations: this.pointModel.getDestinations(),
     });
 
     replace(formComponent, pointComponent);
@@ -93,10 +96,10 @@ export default class MainPresenter {
     }
 
     const pointComponent = new PointView({
-      point: point,
+      point,
       destination: this.pointModel.getDestinationById(point.destination),
       offers: this.pointModel.getOffersByType(point.type),
-      onArrowClick: () => this.#replacePointToForm(pointId)
+      onOpenClick: () => this.#replacePointToForm(pointId)
     });
 
     replace(pointComponent, formComponent);

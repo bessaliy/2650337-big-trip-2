@@ -2,12 +2,12 @@ import {getRandomInteger, getRandomId, getRandomArrayElement, getRandomDates} fr
 import {getDestinations} from './destinations.js';
 import {getOffers} from './offers.js';
 import {PRICE, DATE_START, DATE_END} from './mock-const.js';
-export const destinationsAll = getDestinations();
+export const allDestinations = getDestinations();
 export const offersByType = getOffers();
 
 export function getPoint() {
   const dates = getRandomDates(DATE_START, DATE_END);
-  const destination = getRandomArrayElement(destinationsAll);
+  const destination = getRandomArrayElement(allDestinations);
   const offerItem = getRandomArrayElement(offersByType);
   const { offers } = offerItem;
   const offer = getRandomArrayElement(offers);

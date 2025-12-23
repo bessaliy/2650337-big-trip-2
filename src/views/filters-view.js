@@ -1,5 +1,8 @@
 import AbstractView from '../framework/view/abstract-view.js';
-
+const filterIsChecked = (filterType, currentFilterType) => filterType === currentFilterType ? 'checked' : '';
+const filterIsDisabled = (filterCount) => filterCount === 0 ? 'disabled' : '';
+const filterToUpperCase = (filterType) => filterType.charAt(0).toUpperCase() + filterType.slice(1);
+const filterNumber = (filterCount) => filterCount > 0 ? ` (${filterCount})` : '';
 function createFiltersTemplate(filters, currentFilterType = 'everything') {
   return `
     <form class="trip-filters" action="#" method="get">
@@ -11,11 +14,11 @@ function createFiltersTemplate(filters, currentFilterType = 'everything') {
             type="radio"
             name="trip-filter"
             value="${filter.type}"
-            ${filter.type === currentFilterType ? 'checked' : ''}
-            ${filter.count === 0 ? 'disabled' : ''}>
+            ${filterIsChecked(filter.type, currentFilterType)}
+            ${filterIsDisabled(filter.count)}>
           <label class="trip-filters__filter-label" for="filter-${filter.type}">
-            ${filter.type.charAt(0).toUpperCase() + filter.type.slice(1)}
-            ${filter.count > 0 ? ` (${filter.count})` : ''}
+            ${filterToUpperCase(filter.type)}
+            ${filterNumber(filter.count)}
           </label>
         </div>`).join('')}
       <button class="visually-hidden" type="submit">Accept filter</button>
@@ -25,7 +28,7 @@ function createFiltersTemplate(filters, currentFilterType = 'everything') {
 
 export default class FiltersView extends AbstractView {
   #filters = null;
-  #currentFilterType = null;
+  #currentFilterType;
 
   constructor({ filters, currentFilterType = 'everything' }) {
     super();
@@ -37,3 +40,4 @@ export default class FiltersView extends AbstractView {
     return createFiltersTemplate(this.#filters, this.#currentFilterType);
   }
 }
+

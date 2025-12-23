@@ -20,3 +20,23 @@ export const FILTER_TYPES = {
   PRESENT: 'present',
   PAST: 'past',
 };
+export const SORT_TYPES = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer'
+};
+export const SORT_ITEMS = [
+  { type: SORT_TYPES.DAY, label: 'Day', isDisabled: false, isChecked: true },
+  { type: SORT_TYPES.EVENT, label: 'Event', isDisabled: true, isChecked: false },
+  { type: SORT_TYPES.TIME, label: 'Time', isDisabled: false, isChecked: false },
+  { type: SORT_TYPES.PRICE, label: 'Price', isDisabled: false, isChecked: false },
+  { type: SORT_TYPES.OFFER, label: 'Offers', isDisabled: true, isChecked: false }
+];
+export const EMPTY_MESSAGES = {
+  EVERYTHING: 'Click New Event to create your first point',
+  FUTURE: 'There are no past events now',
+  PRESENT: 'There are no present events now',
+  PAST: 'There are no past events now',
+};

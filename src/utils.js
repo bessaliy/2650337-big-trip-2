@@ -48,7 +48,7 @@ export function capitalizeString(string) {
 export const filter = {
   [FILTER_TYPES.EVERYTHING]: (points) => points,
   [FILTER_TYPES.FUTURE]: (points) => points.filter((point) => {
-    const pointDateFrom = dayjs(point.date_from); // проверь названия полей!
+    const pointDateFrom = dayjs(point.date_from);
     const now = dayjs();
     return pointDateFrom.isAfter(now);
   }),
