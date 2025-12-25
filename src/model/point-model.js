@@ -32,4 +32,13 @@ export default class PointModel {
       isDisabled: filter.count === 0
     }));
   }
+
+  updatePoint(updatedPoint) {
+    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
+    if (index !== -1) {
+      this.#points[index] = updatedPoint;
+      return true;
+    }
+    return false;
+  }
 }
