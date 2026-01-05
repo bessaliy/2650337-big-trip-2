@@ -9,6 +9,7 @@ export default class PointPresenter {
   #destination = null;
   #destinations = [];
   #container = null;
+  #allOffers = null;
   #handleDataChange = () => null;
   #handleModeChange = () => null;
 
@@ -17,15 +18,17 @@ export default class PointPresenter {
   #mode = MODES.DEFAULT;
   #escKeydownHandler = null;
 
-  constructor({ point, offers, destination, destinations, container, onDataChange, onModeChange}) {
+  constructor({ point, offers, allOffers, destination, destinations, container, onDataChange, onModeChange}) {
     this.#point = point;
     this.#offers = offers;
+    this.#allOffers = allOffers;
     this.#destination = destination;
     this.#destinations = destinations;
     this.#container = container;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
   }
+
 
   init() {
     this.#renderPoint();
@@ -67,6 +70,7 @@ export default class PointPresenter {
       point: this.#point,
       destination: this.#destination,
       offers: this.#offers,
+      allOffers: this.#allOffers,
       destinations: this.#destinations,
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleFormClose

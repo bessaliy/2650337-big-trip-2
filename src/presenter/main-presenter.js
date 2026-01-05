@@ -51,6 +51,7 @@ export default class MainPresenter {
     const pointPresenter = new PointPresenter({
       point: point,
       destination: this.pointModel.getDestinationById(point.destination),
+      allOffers: this.pointModel.getAllOffers(),
       offers: this.pointModel.getOffersByType(point.type),
       destinations: this.pointModel.getDestinations(),
       container: this.#listComponent.element,
