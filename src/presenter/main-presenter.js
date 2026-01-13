@@ -16,7 +16,7 @@ export default class MainPresenter {
   #newPointPresenter = null;
   #sortComponent = null;
   #currentSortType = SORT_TYPES.DAY;
-  #emptyView = null;
+  #emptyMessageComponent = null;
   #newEventButton = document.querySelector('.trip-main__event-add-btn');
 
 
@@ -73,9 +73,9 @@ export default class MainPresenter {
     const points = this.#getPoints();
     this.#clearPoints();
 
-    if (this.#emptyView) {
-      remove(this.#emptyView);
-      this.#emptyView = null;
+    if (this.#emptyMessageComponent) {
+      remove(this.#emptyMessageComponent);
+      this.#emptyMessageComponent = null;
     }
 
     if (points.length === 0) {
@@ -128,9 +128,9 @@ export default class MainPresenter {
   #renderEmptyList() {
     const filterType = this.filterModel.getFilter().toUpperCase();
     const message = EMPTY_MESSAGES[filterType];
-    this.#emptyView = new EmptyListView(message);
+    this.#emptyMessageComponent = new EmptyListView(message);
 
-    render(this.#emptyView, this.tripElement);
+    render(this.#emptyMessageComponent, this.tripElement);
   }
 
   #handlePointUpdate = (updatedPoint) => {

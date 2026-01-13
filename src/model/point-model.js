@@ -22,10 +22,6 @@ export default class PointModel {
     this.#observers.add(callback);
   }
 
-  removeObserver(callback) {
-    this.#observers.delete(callback);
-  }
-
   #notify() {
     this.#observers.forEach((callback) => callback());
   }
@@ -61,16 +57,13 @@ export default class PointModel {
   }
 
   addPoint(point) {
-    this.#points.push(point);
+    this.#points = [...this.#points, point];
     this.#notify();
   }
 
   updatePoint(updatedPoint) {
-    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
-    if (index !== -1) {
-      this.#points[index] = updatedPoint;
-      this.#notify();
-    }
+    this.#points = this.#points.map((point) => point.id === updatedPoint.id ? updatedPoint : point);
+    this.#notify();
   }
 
   deletePoint(point) {

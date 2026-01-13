@@ -1,5 +1,6 @@
 import NewFormView from '../views/new-form-view.js';
 import {render, remove} from '../framework/render.js';
+import {emptyPoint} from '../const.js';
 
 export default class NewPointPresenter {
   #container = null;
@@ -20,19 +21,10 @@ export default class NewPointPresenter {
   }
 
   init() {
-    if (this.#formComponent !== null) {
-      return;
-    }
-
-    const point = this.#createEmptyPoint();
-    const offersByType = this.#allOffers.find(
-      (offer) => offer.type === point.type
-    );
 
     this.#formComponent = new NewFormView({
-      point: this.#createEmptyPoint(),
+      point: emptyPoint,
       destination: this.#destinations[0],
-      offers: offersByType,
       allOffers: this.#allOffers,
       destinations: this.#destinations,
       onSubmit: this.#handleFormSubmit,
@@ -72,18 +64,4 @@ export default class NewPointPresenter {
       this.destroy();
     }
   };
-
-  #createEmptyPoint() {
-    return {
-      id: crypto.randomUUID(),
-      basePrice: 0,
-      dateFrom: new Date(),
-      dateTo: new Date(),
-      destination: this.#destinations[0].id,
-      offers: [],
-      type: 'flight',
-      isFavorite: false,
-    };
-  }
-
 }
