@@ -22,3 +22,4 @@ const mainPresenter = new MainPresenter({
 
 filterPresenter.init();
 mainPresenter.init();
+

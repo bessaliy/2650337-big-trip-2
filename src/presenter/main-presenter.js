@@ -40,6 +40,7 @@ export default class MainPresenter {
     this.pointModel.addObserver(this.#handleModelChange);
     this.filterModel.addObserver(this.#handleModelChange);
 
+
     this.#renderBoard();
   }
 
@@ -70,6 +71,7 @@ export default class MainPresenter {
   }
 
   #renderBoard() {
+
     const points = this.#getPoints();
     this.#clearPoints();
 

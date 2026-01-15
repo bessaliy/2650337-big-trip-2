@@ -65,3 +65,9 @@ export const FLATPICKR_BASE_OPTIONS = {
   enableTime: true,
   dateFormat: DATE_FORMAT.FLATPICKR,
 };
+export const RenderPosition = {
+  BEFOREBEGIN: 'beforebegin',
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+  AFTEREND: 'afterend',
+};
