@@ -99,7 +99,7 @@ function createNewFormTemplate(point, offers, destination, destinations) {
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">Delete</button>
+                  <button class="event__reset-btn" type="button">Delete</button>
                   <button class="event__rollup-btn" type="button">
                     <span class="visually-hidden">Open event</span>
                   </button>
@@ -200,6 +200,29 @@ export default class NewFormView extends AbstractStatefulView {
     );
   }
 
+  setSaving() {
+    this.#setDisabled(true);
+    this.element.querySelector('.event__save-btn').textContent = 'Saving...';
+  }
+
+  setDeleting() {
+    this.#setDisabled(true);
+    this.element.querySelector('.event__reset-btn').textContent = 'Deleting...';
+  }
+
+  setAborting() {
+    this.#setDisabled(false);
+    this.element.querySelector('.event__save-btn').textContent = 'Save';
+    this.element.querySelector('.event__reset-btn').textContent = 'Delete';
+    this.shake();
+  }
+
+  #setDisabled(isDisabled) {
+    this.element.querySelectorAll('input, button, textarea, select').forEach((element) => {
+      element.disabled = isDisabled;
+    });
+  }
+
   #destroyDatePickers() {
     if (this.#dateFromPicker) {
       this.#dateFromPicker.destroy();
@@ -249,7 +272,6 @@ export default class NewFormView extends AbstractStatefulView {
   };
 
   #deleteHandler = (evt) => {
-
     evt.preventDefault();
     this.#handleDelete(this._state.point);
   };
@@ -273,6 +295,21 @@ export default class NewFormView extends AbstractStatefulView {
     }
   };
 
+  #handleOffersChange = (evt) => {
+    const offerId = evt.target.name;
+    const checked = evt.target.checked;
+
+    const current = this._state.point.offers; // массив id
+
+    const nextOffers = checked
+      ? [...current, offerId]
+      : current.filter((id) => id !== offerId);
+
+    this._setState({
+      point: { ...this._state.point, offers: nextOffers },
+    });
+  };
+
   _restoreHandlers() {
     this.#destroyDatePickers();
     this.#initHandlers();
@@ -281,6 +318,9 @@ export default class NewFormView extends AbstractStatefulView {
     });
     this.element.querySelector('.event__input--destination')
       .addEventListener('change', this.#handleDestinationChange);
+
+    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#handleOffersChange);
+
     this.#setDatePickers();
   }
 }
