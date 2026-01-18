@@ -28,6 +28,7 @@ const mainPresenter = new MainPresenter({
   tripElement: tripElement,
   pointModel: pointModel,
   filterModel: filterModel,
+  api,
 });
 
 const loadingView = new LoadingView();

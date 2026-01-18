@@ -6,18 +6,22 @@ export default class NewPointPresenter {
   #container = null;
   #destinations = [];
   #allOffers = null;
+  #api = null;
+  #pointModel = null;
 
   #handleDataChange = () => {};
   #handleDestroy = () => {};
 
   #formComponent = null;
 
-  constructor({ container, destinations, allOffers, onDataChange, onDestroy }) {
+  constructor({ container, destinations, allOffers, onDataChange, onDestroy, api, pointModel }) {
     this.#container = container;
     this.#destinations = destinations;
     this.#allOffers = allOffers;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
+    this.#api = api;
+    this.#pointModel = pointModel;
   }
 
   init() {
@@ -49,9 +53,16 @@ export default class NewPointPresenter {
     this.#handleDestroy();
   }
 
-  #handleFormSubmit = (point) => {
-    this.#handleDataChange(point);
-    this.destroy();
+  #handleFormSubmit = async (point) => {
+    this.#formComponent.setSaving();
+
+    try {
+      const createdPoint = await this.#api.addPoint(point);
+      this.#pointModel.addPoint(createdPoint);
+      this.destroy();
+    } catch {
+      this.#formComponent.setAborting();
+    }
   };
 
   #handleFormCancel = () => {

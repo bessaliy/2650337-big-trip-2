@@ -26,14 +26,25 @@ export default class Api extends ApiService {
     })
       .then(ApiService.parseResponse)
       .then((updatedPoint) => this.#adaptPointToClient(updatedPoint));
-    // .then(this.#adaptPointToClient);
   }
 
-  // ↓↓↓ адаптеры ↓↓↓
-  // #adaptPointsToClient(points) {
-  //   return points.map((point) => this.#adaptPointToClient(point));
-  //   // return points.map(this.#adaptPointToClient);
-  // }
+  addPoint(point) {
+    return this._load({
+      url: 'points',
+      method: 'POST',
+      body: JSON.stringify(this.#adaptPointToServer(point)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(ApiService.parseResponse)
+      .then(this.#adaptPointToClient);
+  }
+
+  deletePoint(point) {
+    return this._load({
+      url: `points/${point.id}`,
+      method: 'DELETE',
+    });
+  }
 
   #adaptPointToClient(point) {
     return {
@@ -48,11 +59,13 @@ export default class Api extends ApiService {
   #adaptPointToServer(point) {
     /* eslint-disable camelcase */
     return {
-      ...point,
       base_price: point.basePrice,
-      date_from: point.dateFrom.toISOString(),
-      date_to: point.dateTo.toISOString(),
+      date_from: point.dateFrom instanceof Date ? point.dateFrom.toISOString() : point.dateFrom,
+      date_to: point.dateTo instanceof Date ? point.dateTo.toISOString() : point.dateTo,
+      destination: point.destination,
       is_favorite: point.isFavorite,
+      offers: point.offers,
+      type: point.type,
     };
     /* eslint-enable camelcase */
   }

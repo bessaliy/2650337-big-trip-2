@@ -105,16 +105,29 @@ export default class PointPresenter {
     this.#handleDataChange?.(updatedPoint);
   };
 
-  #handleFormSubmit = (updatedPoint) => {
-    this.#handleDataChange(updatedPoint);
+  #handleFormSubmit = async (updatedPoint) => {
+    this.#formComponent.setSaving();
+
+    try {
+      await this.#handleDataChange(updatedPoint);
+      this.#replaceFormToPoint();
+    } catch {
+      this.#formComponent.setAborting();
+    }
   };
 
   #handleFormClose = () => {
     this.#replaceFormToPoint();
   };
 
-  #handleFormDelete = (point) => {
-    this.#handlePointDelete(point);
+  #handleFormDelete = async (point) => {
+    this.#formComponent.setDeleting();
+
+    try {
+      await this.#handlePointDelete(point);
+    } catch {
+      this.#formComponent.setAborting();
+    }
   };
 
   #onEscKeydown(evt) {

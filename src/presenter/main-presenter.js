@@ -18,12 +18,14 @@ export default class MainPresenter {
   #currentSortType = SORT_TYPES.DAY;
   #emptyMessageComponent = null;
   #newEventButton = document.querySelector('.trip-main__event-add-btn');
+  #api = null;
 
 
-  constructor({ tripElement, pointModel, filterModel }) {
+  constructor({ tripElement, pointModel, filterModel, api }) {
     this.tripElement = tripElement;
     this.pointModel = pointModel;
     this.filterModel = filterModel;
+    this.#api = api;
   }
 
   init() {
@@ -35,6 +37,7 @@ export default class MainPresenter {
       destinations: this.pointModel.getDestinations(),
       onDataChange: this.#handleNewPointSubmit,
       onDestroy: this.#handleNewPointDestroy,
+      api: this.#api,
     });
 
     this.pointModel.addObserver(this.#handleModelChange);
@@ -135,12 +138,13 @@ export default class MainPresenter {
     render(this.#emptyMessageComponent, this.tripElement);
   }
 
-  #handlePointUpdate = (updatedPoint) => {
-    this.pointModel.updatePoint(updatedPoint);
-
+  #handlePointUpdate = async (updatedPoint) => {
+    const response = await this.#api.updatePoint(updatedPoint);
+    this.pointModel.updatePoint(response);
   };
 
-  #handlePointDelete = (point) => {
+  #handlePointDelete = async (point) => {
+    await this.#api.deletePoint(point);
     this.pointModel.deletePoint(point);
   };
 
