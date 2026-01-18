@@ -71,3 +71,7 @@ export const RenderPosition = {
   BEFOREEND: 'beforeend',
   AFTEREND: 'afterend',
 };
+export const API_METHOD = {
+  GET: 'GET',
+  PUT: 'PUT',
+};

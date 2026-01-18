@@ -1,21 +1,9 @@
-import {POINTS_AMOUNT} from '../mock/mock-const.js';
-import { getPoint, allDestinations, offersByType} from '../mock/points.js';
 import { generateFilter } from '../utils.js';
 
-function transformPointToCamelCase(point) {
-  return {
-    ...point,
-    basePrice: point.base_price,
-    dateFrom: point.date_from,
-    dateTo: point.date_to,
-    isFavorite: point.is_favorite
-  };
-}
-
 export default class PointModel {
-  #points = Array.from({ length: POINTS_AMOUNT }, () => transformPointToCamelCase(getPoint()));
-  #offers = offersByType;
-  #destinations = allDestinations;
+  #points = [];
+  #offers = [];
+  #destinations = [];
   #observers = new Set();
 
   addObserver(callback) {
@@ -30,8 +18,18 @@ export default class PointModel {
     return this.#points;
   }
 
+  setPoints(points) {
+    this.#points = points;
+    this.#notify();
+  }
+
   getAllOffers() {
     return this.#offers;
+  }
+
+  setOffers(offers) {
+    this.#offers = offers;
+    this.#notify();
   }
 
   getOffersByType(type) {
@@ -40,6 +38,11 @@ export default class PointModel {
 
   getDestinations() {
     return this.#destinations;
+  }
+
+  setDestinations(destinations) {
+    this.#destinations = destinations;
+    this.#notify();
   }
 
   getDestinationById(id) {

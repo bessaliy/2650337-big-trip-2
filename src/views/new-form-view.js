@@ -46,7 +46,9 @@ function createPhotosTemplate(pictures) {
 }
 
 function createDescriptionTemplate(description) {
-  return description.length > 0 ? `<p class="event__destination-description">${description}</p>` : '';
+  return description.length > 0 ? `<section class="event__section  event__section--destination">
+                  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+                  <p class="event__destination-description">${description}</p>` : '';
 }
 
 function createNewFormTemplate(point, offers, destination, destinations) {
@@ -104,8 +106,6 @@ function createNewFormTemplate(point, offers, destination, destinations) {
                 </header>
                 <section class="event__details">
                 ${createOfferListTemplate(offers.offers, checkedOffersId)}
-                <section class="event__section  event__section--destination">
-                  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
                     ${createDescriptionTemplate(description)}
                 <div class="event__photos-container">
                    ${createPhotosTemplate(pictures)}
