@@ -1,4 +1,4 @@
-import { pointTypes, DATE_FORMAT} from '../const.js';
+import { pointTypes, DATE_FORMAT, FLATPICKR_BASE_OPTIONS} from '../const.js';
 import { humanizePointDueDate, capitalizeString } from '../utils.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
@@ -46,7 +46,9 @@ function createPhotosTemplate(pictures) {
 }
 
 function createDescriptionTemplate(description) {
-  return description.length > 0 ? `<p class="event__destination-description">${description}</p>` : '';
+  return description.length > 0 ? `<section class="event__section  event__section--destination">
+                  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+                  <p class="event__destination-description">${description}</p>` : '';
 }
 
 function createNewFormTemplate(point, offers, destination, destinations) {
@@ -104,8 +106,6 @@ function createNewFormTemplate(point, offers, destination, destinations) {
                 </header>
                 <section class="event__details">
                 ${createOfferListTemplate(offers.offers, checkedOffersId)}
-                <section class="event__section  event__section--destination">
-                  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
                     ${createDescriptionTemplate(description)}
                 <div class="event__photos-container">
                    ${createPhotosTemplate(pictures)}
@@ -126,11 +126,10 @@ export default class NewFormView extends AbstractStatefulView {
   #dateFromPicker = null;
   #dateToPicker = null;
 
-  constructor({ point, offers, allOffers, destination, onSubmit, onClose, onDelete, destinations}) {
+  constructor({ point, allOffers, destination, onSubmit, onClose, onDelete, destinations}) {
     super();
     this._state = {
       point: point,
-      offers: offers,
       destination: destination,
     };
     this.#allOffers = allOffers;
@@ -142,6 +141,7 @@ export default class NewFormView extends AbstractStatefulView {
   }
 
   get template() {
+    this._state.offers = this.#getOffersByType();
     return createNewFormTemplate(
       this._state.point,
       this._state.offers,
@@ -150,7 +150,13 @@ export default class NewFormView extends AbstractStatefulView {
     );
   }
 
-  #handlers() {
+  #getOffersByType() {
+    return this.#allOffers.find(
+      (offer) => offer.type === this._state.point.type
+    );
+  }
+
+  #initHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#submitHandler);
     this.element.querySelector('.event__rollup-btn')
@@ -166,8 +172,7 @@ export default class NewFormView extends AbstractStatefulView {
     this.#dateFromPicker = flatpickr(
       this.element.querySelector(`#event-start-time-${id}`),
       {
-        enableTime: true,
-        dateFormat: DATE_FORMAT.FLATPICKR,
+        ...FLATPICKR_BASE_OPTIONS,
         defaultDate: dateFrom,
         onChange: ([userDate]) => {
           this._state.point.dateFrom = userDate;
@@ -185,8 +190,7 @@ export default class NewFormView extends AbstractStatefulView {
     this.#dateToPicker = flatpickr(
       this.element.querySelector(`#event-end-time-${id}`),
       {
-        enableTime: true,
-        dateFormat: DATE_FORMAT.FLATPICKR,
+        ...FLATPICKR_BASE_OPTIONS,
         defaultDate: dateTo,
         minDate: dateFrom,
         onChange: ([userDate]) => {
@@ -271,7 +275,7 @@ export default class NewFormView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.#destroyDatePickers();
-    this.#handlers();
+    this.#initHandlers();
     this.element.querySelectorAll('.event__type-input').forEach((input) => {
       input.addEventListener('change', this.#handleTypeChange);
     });

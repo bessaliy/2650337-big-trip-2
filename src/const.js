@@ -50,3 +50,28 @@ export const USER_ACTION = {
   DELETE: 'delete',
   ADD: 'add',
 };
+
+export const emptyPoint = {
+  id: crypto.randomUUID(),
+  basePrice: 0,
+  dateFrom: new Date(),
+  dateTo: new Date(),
+  destination: null,
+  offers: [],
+  type: 'flight',
+  isFavorite: false,
+};
+export const FLATPICKR_BASE_OPTIONS = {
+  enableTime: true,
+  dateFormat: DATE_FORMAT.FLATPICKR,
+};
+export const RenderPosition = {
+  BEFOREBEGIN: 'beforebegin',
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+  AFTEREND: 'afterend',
+};
+export const API_METHOD = {
+  GET: 'GET',
+  PUT: 'PUT',
+};

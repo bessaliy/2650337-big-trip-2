@@ -1,29 +1,13 @@
-import {POINTS_AMOUNT} from '../mock/mock-const.js';
-import { getPoint, allDestinations, offersByType} from '../mock/points.js';
 import { generateFilter } from '../utils.js';
 
-function transformPointToCamelCase(point) {
-  return {
-    ...point,
-    basePrice: point.base_price,
-    dateFrom: point.date_from,
-    dateTo: point.date_to,
-    isFavorite: point.is_favorite
-  };
-}
-
 export default class PointModel {
-  #points = Array.from({ length: POINTS_AMOUNT }, () => transformPointToCamelCase(getPoint()));
-  #offers = offersByType;
-  #destinations = allDestinations;
+  #points = [];
+  #offers = [];
+  #destinations = [];
   #observers = new Set();
 
   addObserver(callback) {
     this.#observers.add(callback);
-  }
-
-  removeObserver(callback) {
-    this.#observers.delete(callback);
   }
 
   #notify() {
@@ -34,8 +18,18 @@ export default class PointModel {
     return this.#points;
   }
 
+  setPoints(points) {
+    this.#points = points;
+    this.#notify();
+  }
+
   getAllOffers() {
     return this.#offers;
+  }
+
+  setOffers(offers) {
+    this.#offers = offers;
+    this.#notify();
   }
 
   getOffersByType(type) {
@@ -44,6 +38,11 @@ export default class PointModel {
 
   getDestinations() {
     return this.#destinations;
+  }
+
+  setDestinations(destinations) {
+    this.#destinations = destinations;
+    this.#notify();
   }
 
   getDestinationById(id) {
@@ -61,16 +60,13 @@ export default class PointModel {
   }
 
   addPoint(point) {
-    this.#points.push(point);
+    this.#points = [...this.#points, point];
     this.#notify();
   }
 
   updatePoint(updatedPoint) {
-    const index = this.#points.findIndex((point) => point.id === updatedPoint.id);
-    if (index !== -1) {
-      this.#points[index] = updatedPoint;
-      this.#notify();
-    }
+    this.#points = this.#points.map((point) => point.id === updatedPoint.id ? updatedPoint : point);
+    this.#notify();
   }
 
   deletePoint(point) {
