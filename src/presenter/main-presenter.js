@@ -113,7 +113,6 @@ export default class MainPresenter {
   #getPoints() {
     const filterType = this.filterModel.getFilter();
     const points = this.pointModel.getPoints();
-
     const filteredPoints = this.#filterPoints(points, filterType);
 
     return this.#getSortedPoints(filteredPoints);

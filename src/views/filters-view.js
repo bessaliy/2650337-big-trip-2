@@ -18,6 +18,7 @@ function createFiltersTemplate(filters, currentFilterType = FILTER_TYPES.EVERYTH
             name="trip-filter"
             value="${filter.type}"
             ${isChecked(filter.type, currentFilterType)}
+            // ${filter.isDisabled ? 'disabled' : ''}
             ${isDisabled(filter.count)}>
           <label class="trip-filters__filter-label" for="filter-${filter.type}">
             ${capitalizeString(filter.type)}
