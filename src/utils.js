@@ -17,12 +17,12 @@ export function getDifferenceInTime(start, end) {
   const minutes = Math.floor((diffMs % MILLISECONDS_IN_HOUR) / MILLISECONDS_IN_MINUTE);
 
   if (diffMs < MILLISECONDS_IN_HOUR) {
-    return `${minutes}M`;
+    return `${String(minutes).padStart(2, '0')}M`;
   }
   if (diffMs < MILLISECONDS_IN_DAY) {
-    return `${hours}H ${minutes}M`;
+    return `${String(hours).padStart(2, '0')}H ${String(minutes).padStart(2, '0')}M`;
   }
-  return `${days}D ${hours}H ${minutes}M`;
+  return `${String(days).padStart(2, '0')}D ${String(hours).padStart(2, '0')}H ${String(minutes).padStart(2, '0')}M`;
 }
 
 export function capitalizeString(string) {
@@ -36,17 +36,17 @@ export const filter = {
     const now = dayjs();
     return pointDateFrom.isAfter(now);
   }),
-  [FILTER_TYPES.PAST]: (points) => points.filter((point) => {
-    const pointDateTo = dayjs(point.date_to);
-    const now = dayjs();
-    return pointDateTo.isBefore(now);
-  }),
   [FILTER_TYPES.PRESENT]: (points) => points.filter((point) => {
     const pointDateFrom = dayjs(point.date_from);
     const pointDateTo = dayjs(point.date_to);
     const now = dayjs();
     return (pointDateFrom.isSame(now) || pointDateFrom.isBefore(now)) &&
       (pointDateTo.isSame(now) || pointDateTo.isAfter(now));
+  }),
+  [FILTER_TYPES.PAST]: (points) => points.filter((point) => {
+    const pointDateTo = dayjs(point.date_to);
+    const now = dayjs();
+    return pointDateTo.isBefore(now);
   }),
 };
 

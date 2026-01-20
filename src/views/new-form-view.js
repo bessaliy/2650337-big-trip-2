@@ -37,11 +37,13 @@ function createOfferListTemplate(offers, checkedOffersId) {
 
 function createPhotosTemplate(pictures) {
   return pictures.length > 0 ?
-    `<div class="event__photos-tape">
+    `<div class="event__photos-container">
+<div class="event__photos-tape">
  ${pictures.map(({ src, description }) =>
     `<img class="event__photo" src="${src}" alt="${description}">`
   ).join('')}
-    </div>`
+    </div>
+</div>`
     : '';
 }
 
@@ -51,7 +53,7 @@ function createDescriptionTemplate(description) {
                   <p class="event__destination-description">${description}</p>` : '';
 }
 
-function createNewFormTemplate(point, offers, destination, destinations) {
+function createNewFormTemplate(point, offers, destination, destinations, buttonType) {
   const { id, basePrice, dateFrom, dateTo, offers: checkedOffersId, type } = point;
   const { name, description, pictures } = destination;
   return `<li class="trip-events__item">
@@ -99,7 +101,7 @@ function createNewFormTemplate(point, offers, destination, destinations) {
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="button">Delete</button>
+                  <button class="event__reset-btn" type="button">${buttonType}</button>
                   <button class="event__rollup-btn" type="button">
                     <span class="visually-hidden">Open event</span>
                   </button>
@@ -107,9 +109,7 @@ function createNewFormTemplate(point, offers, destination, destinations) {
                 <section class="event__details">
                 ${createOfferListTemplate(offers.offers, checkedOffersId)}
                     ${createDescriptionTemplate(description)}
-                <div class="event__photos-container">
                    ${createPhotosTemplate(pictures)}
-                </div>
                 </section>
                 </section >
             </form >
@@ -125,9 +125,11 @@ export default class NewFormView extends AbstractStatefulView {
   #handleDelete = () => {};
   #dateFromPicker = null;
   #dateToPicker = null;
+  #buttonType = '';
 
-  constructor({ point, allOffers, destination, onSubmit, onClose, onDelete, destinations}) {
+  constructor({ point, allOffers, destination, onSubmit, onClose, onDelete, destinations, buttonType}) {
     super();
+
     this._state = {
       point: point,
       destination: destination,
@@ -137,6 +139,7 @@ export default class NewFormView extends AbstractStatefulView {
     this.#handleClose = onClose;
     this.#handleDelete = onDelete;
     this.#destinations = destinations;
+    this.#buttonType = buttonType;
     this._restoreHandlers();
   }
 
@@ -147,6 +150,7 @@ export default class NewFormView extends AbstractStatefulView {
       this._state.offers,
       this._state.destination,
       this.#destinations,
+      this.#buttonType,
     );
   }
 
@@ -213,7 +217,7 @@ export default class NewFormView extends AbstractStatefulView {
   setAborting() {
     this.#setDisabled(false);
     this.element.querySelector('.event__save-btn').textContent = 'Save';
-    this.element.querySelector('.event__reset-btn').textContent = 'Delete';
+    this.element.querySelector('.event__reset-btn').textContent = this.#buttonType;
     this.shake();
   }
 
@@ -283,7 +287,7 @@ export default class NewFormView extends AbstractStatefulView {
       offers: this.#allOffers.find((allOffers) => allOffers.type === newType).offers
     };
     this.updateElement({
-      point: {...this._state.point, type: newType},
+      point: {...this._state.point, type: newType, offers: []},
       offers: newOffers
     });
   };
@@ -299,11 +303,11 @@ export default class NewFormView extends AbstractStatefulView {
     const offerId = evt.target.name;
     const checked = evt.target.checked;
 
-    const current = this._state.point.offers; // массив id
+    const currentOffers = this._state.point.offers;
 
     const nextOffers = checked
-      ? [...current, offerId]
-      : current.filter((id) => id !== offerId);
+      ? [...currentOffers, offerId]
+      : currentOffers.filter((id) => id !== offerId);
 
     this._setState({
       point: { ...this._state.point, offers: nextOffers },

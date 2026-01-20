@@ -11,6 +11,7 @@ import {SORT_ITEMS, SORT_TYPES, FILTER_TYPES, EMPTY_MESSAGES} from '../const.js'
 import {sortPoints, filtersPoints} from '../utils.js';
 
 export default class MainPresenter {
+  #isCreating = false;
   #listComponent = new EventsListView();
   #pointPresenters = new Map();
   #newPointPresenter = null;
@@ -30,19 +31,9 @@ export default class MainPresenter {
 
   init() {
     this.#newEventButton.addEventListener('click', this.#handleNewEventClick);
-    this.#newPointPresenter = new NewPointPresenter({
-      container: this.tripElement,
-      pointModel: this.pointModel,
-      allOffers: this.pointModel.getAllOffers(),
-      destinations: this.pointModel.getDestinations(),
-      onDataChange: this.#handleNewPointSubmit,
-      onDestroy: this.#handleNewPointDestroy,
-      api: this.#api,
-    });
 
     this.pointModel.addObserver(this.#handleModelChange);
     this.filterModel.addObserver(this.#handleModelChange);
-
 
     this.#renderBoard();
   }
@@ -58,6 +49,8 @@ export default class MainPresenter {
       onDataChange: this.#handlePointUpdate,
       onModeChange: this.#handleModeChange,
       onPointDelete: this.#handlePointDelete,
+      canOpenForm: () => !this.#isCreating,
+      onBeforeOpen: this.#beforeOpenPointForm,
     });
 
     pointPresenter.init();
@@ -69,12 +62,35 @@ export default class MainPresenter {
       SORT_ITEMS,
       this.#handleSortTypeChange,
     );
-    render(this.#sortComponent, this.tripElement);
-    render(this.#listComponent, this.tripElement);
+    render(this.#sortComponent, this.tripElement, 'afterbegin');
   }
 
-  #renderBoard() {
+  #renderList() {
+    if (!this.tripElement.contains(this.#listComponent.element)) {
+      render (this.#listComponent, this.tripElement);
+    }
+  }
 
+  #renderNewPointPresenter() {
+    if (!this.#newPointPresenter) {
+      this.#newPointPresenter = new NewPointPresenter({
+        container: this.#listComponent.element,
+        allOffers: this.pointModel.getAllOffers(),
+        destinations: this.pointModel.getDestinations(),
+        onDataChange: this.#handleNewPointSubmit,
+        onDestroy: this.#handleNewPointDestroy,
+      });
+    }
+  }
+
+  #beforeOpenPointForm = () => {
+    if (this.#isCreating) {
+      this.#newPointPresenter.destroy();
+    }
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #renderBoard() {
     const points = this.#getPoints();
     this.#clearPoints();
 
@@ -88,6 +104,10 @@ export default class MainPresenter {
         remove(this.#sortComponent);
         this.#sortComponent = null;
       }
+
+      this.#renderList();
+      this.#renderNewPointPresenter();
+
       this.#renderEmptyList();
       return;
     }
@@ -95,6 +115,10 @@ export default class MainPresenter {
     if (!this.#sortComponent) {
       this.#renderSort();
     }
+
+    this.#renderList();
+    this.#renderNewPointPresenter();
+
     this.#renderPoints(points);
   }
 
@@ -102,6 +126,7 @@ export default class MainPresenter {
     if (filterType === FILTER_TYPES.EVERYTHING) {
       return points;
     }
+    this.#handleSortTypeChange(SORT_TYPES.DAY);
 
     const now = dayjs();
 
@@ -165,16 +190,26 @@ export default class MainPresenter {
 
   #handleNewEventClick = (evt) => {
     evt.preventDefault();
+    this.#currentSortType = SORT_TYPES.DAY;
+    this.filterModel.setFilter(FILTER_TYPES.EVERYTHING);
+
+    this.#renderList();
+    this.#renderNewPointPresenter();
+
+    this.#isCreating = true;
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
     this.#newPointPresenter.init();
     this.#newEventButton.disabled = true;
   };
 
-  #handleNewPointSubmit = (point) => {
-    this.pointModel.addPoint(point);
+  #handleNewPointSubmit = async (point) => {
+    const createdPoint = await this.#api.addPoint(point);
+    this.pointModel.addPoint(createdPoint);
+    return createdPoint;
   };
 
   #handleNewPointDestroy = () => {
+    this.#isCreating = false;
     this.#newEventButton.disabled = false;
   };
 

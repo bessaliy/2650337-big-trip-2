@@ -1,7 +1,7 @@
 import PointView from '../views/point-view.js';
 import NewFormView from '../views/new-form-view.js';
 import { render, replace } from '../framework/render.js';
-import {MODES} from '../const.js';
+import {MODES, BUTTON_TYPES} from '../const.js';
 
 export default class PointPresenter {
   #point = null;
@@ -13,13 +13,15 @@ export default class PointPresenter {
   #handleDataChange = () => null;
   #handlePointDelete = () => null;
   #handleModeChange = () => null;
+  #handleBeforeOpen = () => null;
 
   #pointComponent = null;
   #formComponent = null;
   #mode = MODES.DEFAULT;
   #escKeydownHandler = null;
+  #canOpenForm = () => true;
 
-  constructor({ point, offers, allOffers, destination, destinations, container, onDataChange, onPointDelete, onModeChange}) {
+  constructor({ point, offers, allOffers, destination, destinations, container, onDataChange, onPointDelete, onModeChange, canOpenForm, onBeforeOpen}) {
     this.#point = point;
     this.#offers = offers;
     this.#allOffers = allOffers;
@@ -29,6 +31,8 @@ export default class PointPresenter {
     this.#handleDataChange = onDataChange;
     this.#handlePointDelete = onPointDelete;
     this.#handleModeChange = onModeChange;
+    this.#canOpenForm = canOpenForm ?? (() => true);
+    this.#handleBeforeOpen = onBeforeOpen ?? (() => {});
   }
 
 
@@ -77,6 +81,7 @@ export default class PointPresenter {
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleFormClose,
       onDelete: this.#handleFormDelete,
+      buttonType: BUTTON_TYPES.EXISTING_FORM,
     });
 
     replace(this.#formComponent, this.#pointComponent);
@@ -93,6 +98,7 @@ export default class PointPresenter {
   }
 
   #handleOpenClick = () => {
+    this.#handleBeforeOpen();
     this.#replacePointToForm();
   };
 

@@ -35,17 +35,25 @@ export const EMPTY_MESSAGES = {
   PRESENT: 'There are no present events now',
   PAST: 'There are no past events now',
 };
+export const LOAD_MESSAGES = {
+  LOADING: 'Loading...',
+  FAILED_LOAD: 'Failed to load latest route information',
+};
+export const BUTTON_TYPES = {
+  NEW_FORM: 'Cancel',
+  EXISTING_FORM: 'Delete',
+};
 export const MODES = {
   DEFAULT: 'default',
   EDITING: 'editing',
 };
 
-export const emptyPoint = {
+export const EMPTY_POINT = {
   id: crypto.randomUUID(),
-  basePrice: 0,
+  basePrice: 1,
   dateFrom: new Date(),
-  dateTo: new Date(),
-  destination: null,
+  dateTo: new Date(Date.now() + 60 * 60 * 1000),
+  destination: '',
   offers: [],
   type: 'flight',
   isFavorite: false,

@@ -24,59 +24,56 @@ export default class TripInfoPresenter {
   };
 
   #render() {
-    const prev = this.#tripInfoComponent;
     const data = this.#getTripInfoData();
 
+    const prev = this.#tripInfoComponent;
     this.#tripInfoComponent = new TripInfoView(data);
 
-    if(!prev) {
-      render(this.#tripInfoComponent, this.#container, RenderPosition.AFTERBEGIN);
-    } else {
+    if(prev) {
       replace(this.#tripInfoComponent, prev);
+    } else {
+      render(this.#tripInfoComponent, this.#container, RenderPosition.AFTERBEGIN);
     }
   }
 
   #getTripInfoData() {
     const points = this.#pointModel.getPoints();
 
-    if (!points.length) {
+    if (points?.length > 0) {
+      const sortedPoints = [...points].sort(sortPoints[SORT_TYPES.DAY]);
       return {
-        tripTitle: '',
-        datesRange: '',
-        totalCost: 0,
+        isEmpty: false,
+        tripTitle: this.#buildTripTitle(sortedPoints),
+        datesRange: this.#formatTripDates(sortedPoints),
+        totalCost: this.#calculateTotalCost(sortedPoints),
       };
     }
-    const sortedPoints = [...points].sort(sortPoints[SORT_TYPES.DAY]);
-    const cities = sortedPoints.map((point) => this.#pointModel.getDestinationById(point.destination)?.name)
+    return {
+      isEmpty: true,
+      tripTitle: '',
+      datesRange: '',
+      totalCost: '',
+    };
+  }
+
+  #buildTripTitle(points) {
+    const cities = points.map((point) => this.#pointModel.getDestinationById(point.destination)?.name)
       .filter(Boolean);
     const uniqueCities = cities.filter((city, index) => city !== cities[index - 1]);
-
-    const tripTitle = this.#buildTripTitle(uniqueCities);
-
-    const startDate = sortedPoints[0].dateFrom;
-    const endDate = sortedPoints[sortedPoints.length - 1].dateTo;
-    const datesRange = this.#formatTripDates(startDate, endDate);
-
-    const totalCost = this.#calculateTotalCost(sortedPoints);
-
-    return { tripTitle, datesRange, totalCost };
-  }
-
-  #buildTripTitle(cities) {
-    if (cities.length === 0) {
+    if (uniqueCities.length === 0) {
       return '';
     }
-    if (cities.length <= 3) {
-      return cities.join(' — ');
+    if (uniqueCities.length <= 3) {
+      return uniqueCities.join(' — ');
     }
-    return `${cities[0]} — ... — ${cities[cities.length - 1]}`;
+    return `${uniqueCities[0]} — ... — ${uniqueCities[uniqueCities.length - 1]}`;
   }
 
-  #formatTripDates(startDate, endDate) {
-    const start = dayjs(startDate);
-    const end = dayjs(endDate);
+  #formatTripDates(points) {
+    const startDate = dayjs(points[0].dateFrom);
+    const endDate = dayjs(points[points.length - 1].dateTo);
 
-    return `${start.format(DATE_FORMAT.DAY_MONTH)} — ${end.format(DATE_FORMAT.DAY_MONTH)}`;
+    return `${startDate.format(DATE_FORMAT.DAY_MONTH)} — ${endDate.format(DATE_FORMAT.DAY_MONTH)}`;
   }
 
   #calculateTotalCost(points) {
