@@ -55,7 +55,9 @@ function createDescriptionTemplate(description) {
 
 function createNewFormTemplate(point, offers, destination, destinations, buttonType) {
   const { id, basePrice, dateFrom, dateTo, offers: checkedOffersId, type } = point;
-  const { name, description, pictures } = destination;
+  const name = destination?.name ?? '';
+  const description = destination?.description ?? '';
+  const pictures = destination?.pictures ?? [];
   return `<li class="trip-events__item">
             <form class="event event--edit" action="#" method="post">
                 <header class="event__header">
@@ -86,10 +88,10 @@ function createNewFormTemplate(point, offers, destination, destinations, buttonT
 
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-${id}">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value=${humanizePointDueDate(dateFrom, DATE_FORMAT.DAY_MONTH_YEAR_TIME)}>
+                    <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${dateFrom ? humanizePointDueDate(dateFrom, DATE_FORMAT.DAY_MONTH_YEAR_TIME) : ''}">
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-${id}">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value=${humanizePointDueDate(dateTo, DATE_FORMAT.DAY_MONTH_YEAR_TIME)}>
+                    <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${dateTo ? humanizePointDueDate(dateTo, DATE_FORMAT.DAY_MONTH_YEAR_TIME) : ''}">
                   </div>
 
                   <div class="event__field-group  event__field-group--price">
@@ -97,7 +99,7 @@ function createNewFormTemplate(point, offers, destination, destinations, buttonT
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value=${basePrice}>
+                    <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${basePrice}">
                   </div>
 
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -177,11 +179,12 @@ export default class NewFormView extends AbstractStatefulView {
       this.element.querySelector(`#event-start-time-${id}`),
       {
         ...FLATPICKR_BASE_OPTIONS,
-        defaultDate: dateFrom,
+        defaultDate: dateFrom ?? null,
         onChange: ([userDate]) => {
           this._state.point.dateFrom = userDate;
+          const currentTo = this._state.point.dateTo;
 
-          if (this._state.point.dateTo < userDate) {
+          if (!currentTo || currentTo < userDate) {
             this._state.point.dateTo = userDate;
             this.#dateToPicker.setDate(userDate);
           }
@@ -195,8 +198,8 @@ export default class NewFormView extends AbstractStatefulView {
       this.element.querySelector(`#event-end-time-${id}`),
       {
         ...FLATPICKR_BASE_OPTIONS,
-        defaultDate: dateTo,
-        minDate: dateFrom,
+        defaultDate: dateTo ?? null,
+        minDate: dateFrom ?? null,
         onChange: ([userDate]) => {
           this._state.point.dateTo = userDate;
         },
@@ -314,6 +317,19 @@ export default class NewFormView extends AbstractStatefulView {
     });
   };
 
+  #handlePriceInput = (evt) => {
+    const value = evt.target.value;
+
+    const price = Number(value);
+
+    this._setState({
+      point: {
+        ...this._state.point,
+        basePrice: Number.isFinite(price) ? price : 0,
+      },
+    });
+  };
+
   _restoreHandlers() {
     this.#destroyDatePickers();
     this.#initHandlers();
@@ -324,7 +340,8 @@ export default class NewFormView extends AbstractStatefulView {
       .addEventListener('change', this.#handleDestinationChange);
 
     this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#handleOffersChange);
-
+    this.element.querySelector('.event__input--price')
+      .addEventListener('input', this.#handlePriceInput);
     this.#setDatePickers();
   }
 }

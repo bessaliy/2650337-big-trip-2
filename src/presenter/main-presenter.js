@@ -58,12 +58,19 @@ export default class MainPresenter {
   }
 
   #renderSort() {
-    this.#sortComponent = new SortView(
-      SORT_ITEMS,
-      this.#handleSortTypeChange,
-    );
-    render(this.#sortComponent, this.tripElement, 'afterbegin');
+    const sortItems = this.#getSortItems();
+
+    const prevSortComponent = this.#sortComponent;
+    this.#sortComponent = new SortView(sortItems, this.#handleSortTypeChange);
+
+    if (!prevSortComponent) {
+      render(this.#sortComponent, this.tripElement, 'afterbegin');
+    } else {
+      remove(prevSortComponent);
+      render(this.#sortComponent, this.tripElement, 'afterbegin');
+    }
   }
+
 
   #renderList() {
     if (!this.tripElement.contains(this.#listComponent.element)) {
@@ -108,13 +115,13 @@ export default class MainPresenter {
       this.#renderList();
       this.#renderNewPointPresenter();
 
-      this.#renderEmptyList();
+      if (!this.#isCreating) {
+        this.#renderEmptyList();
+      }
       return;
     }
 
-    if (!this.#sortComponent) {
-      this.#renderSort();
-    }
+    this.#renderSort();
 
     this.#renderList();
     this.#renderNewPointPresenter();
@@ -126,10 +133,8 @@ export default class MainPresenter {
     if (filterType === FILTER_TYPES.EVERYTHING) {
       return points;
     }
-    this.#handleSortTypeChange(SORT_TYPES.DAY);
 
     const now = dayjs();
-
     return points.filter((point) =>
       filtersPoints[filterType](point, now)
     );
@@ -152,6 +157,13 @@ export default class MainPresenter {
       case SORT_TYPES.PRICE:
         return [...points].sort(sortPoints[SORT_TYPES.PRICE]);
     }
+  }
+
+  #getSortItems() {
+    return SORT_ITEMS.map((item) => ({
+      ...item,
+      isChecked: item.type === this.#currentSortType,
+    }));
   }
 
   #renderEmptyList() {
@@ -190,14 +202,28 @@ export default class MainPresenter {
 
   #handleNewEventClick = (evt) => {
     evt.preventDefault();
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+
+    if (this.#isCreating && this.#newPointPresenter) {
+      this.#newPointPresenter.destroy();
+      return;
+    }
+
+    if (this.#emptyMessageComponent) {
+      remove(this.#emptyMessageComponent);
+      this.#emptyMessageComponent = null;
+    }
+
     this.#currentSortType = SORT_TYPES.DAY;
-    this.filterModel.setFilter(FILTER_TYPES.EVERYTHING);
+
+    if (this.filterModel.getFilter() !== FILTER_TYPES.EVERYTHING) {
+      this.filterModel.setFilter(FILTER_TYPES.EVERYTHING);
+    }
 
     this.#renderList();
     this.#renderNewPointPresenter();
 
     this.#isCreating = true;
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
     this.#newPointPresenter.init();
     this.#newEventButton.disabled = true;
   };
@@ -211,6 +237,17 @@ export default class MainPresenter {
   #handleNewPointDestroy = () => {
     this.#isCreating = false;
     this.#newEventButton.disabled = false;
+    const points = this.#getPoints();
+    if (points.length === 0) {
+      if (this.#sortComponent) {
+        remove(this.#sortComponent);
+        this.#sortComponent = null;
+      }
+
+      if (!this.#emptyMessageComponent) {
+        this.#renderEmptyList();
+      }
+    }
   };
 
   #clearPoints() {

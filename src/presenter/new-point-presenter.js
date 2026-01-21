@@ -22,9 +22,16 @@ export default class NewPointPresenter {
 
   init() {
 
+    const emptyPoint = {
+      ...EMPTY_POINT,
+      id: crypto.randomUUID(),
+      destination: '',
+      offers: [],
+    };
+
     this.#formComponent = new NewFormView({
-      point: EMPTY_POINT,
-      destination: this.#destinations[0],
+      point: emptyPoint,
+      destination: null,
       allOffers: this.#allOffers,
       destinations: this.#destinations,
       onSubmit: this.#handleFormSubmit,

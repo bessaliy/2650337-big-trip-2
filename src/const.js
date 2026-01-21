@@ -47,12 +47,11 @@ export const MODES = {
   DEFAULT: 'default',
   EDITING: 'editing',
 };
-
 export const EMPTY_POINT = {
   id: crypto.randomUUID(),
-  basePrice: 1,
-  dateFrom: new Date(),
-  dateTo: new Date(Date.now() + 60 * 60 * 1000),
+  basePrice: 0,
+  dateFrom: null,
+  dateTo: null,
   destination: '',
   offers: [],
   type: 'flight',
