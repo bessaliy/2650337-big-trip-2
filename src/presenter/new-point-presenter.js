@@ -7,12 +7,15 @@ export default class NewPointPresenter {
   #destinations = [];
   #allOffers = null;
 
-  #handleDataChange = () => {};
-  #handleDestroy = () => {};
+  #handleDataChange = () => {
+  };
+
+  #handleDestroy = () => {
+  };
 
   #formComponent = null;
 
-  constructor({ container, destinations, allOffers, onDataChange, onDestroy }) {
+  constructor({container, destinations, allOffers, onDataChange, onDestroy}) {
     this.#container = container;
     this.#destinations = destinations;
     this.#allOffers = allOffers;
@@ -58,22 +61,19 @@ export default class NewPointPresenter {
   }
 
   #handleFormSubmit = async (point) => {
-    if(!this.#formComponent) {
-      return;
-    }
+
 
     this.#formComponent.setSaving();
 
     try {
       await this.#handleDataChange(point);
-      if (!this.#formComponent) {
-        return;
-      }
+
+
       this.destroy();
     } catch {
-      if (this.#formComponent) {
-        this.#formComponent.setAborting();
-      }
+      this.#formComponent.setAborting();
+
+
     }
   };
 

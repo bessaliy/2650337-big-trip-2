@@ -98,9 +98,7 @@ export default class PointPresenter {
   }
 
   #handleOpenClick = () => {
-    if (!this.#canOpenForm()) {
-      return;
-    }
+
     this.#handleBeforeOpen();
     this.#replacePointToForm();
   };
@@ -125,9 +123,9 @@ export default class PointPresenter {
       await this.#handleDataChange(updatedPoint);
       this.#replaceFormToPoint();
     } catch {
-      if (this.#formComponent) {
-        this.#formComponent.setAborting();
-      }
+      this.#formComponent.setAborting();
+
+
     }
   };
 
@@ -141,10 +139,7 @@ export default class PointPresenter {
     try {
       await this.#handlePointDelete(point);
     } catch {
-      if (this.#formComponent) {
-        this.#formComponent.setAborting();
-      }
-
+      this.#formComponent.setAborting();
     }
   };
 

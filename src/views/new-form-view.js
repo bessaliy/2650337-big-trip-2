@@ -40,8 +40,7 @@ function createPhotosTemplate(pictures) {
     `<div class="event__photos-container">
 <div class="event__photos-tape">
  ${pictures.map(({ src, description }) =>
-    `<img class="event__photo" src="${src}" alt="${description}">`
-  ).join('')}
+    `<img class="event__photo" src="${src}" alt="${description}">`).join('')}
     </div>
 </div>`
     : '';
@@ -122,14 +121,20 @@ export default class NewFormView extends AbstractStatefulView {
   _state = null;
   #destinations;
   #allOffers = null;
-  #handleSubmit = () => {};
-  #handleClose = () => {};
-  #handleDelete = () => {};
+  #handleSubmit = () => {
+  };
+
+  #handleClose = () => {
+  };
+
+  #handleDelete = () => {
+  };
+
   #dateFromPicker = null;
   #dateToPicker = null;
   #buttonType = '';
 
-  constructor({ point, allOffers, destination, onSubmit, onClose, onDelete, destinations, buttonType}) {
+  constructor({point, allOffers, destination, onSubmit, onClose, onDelete, destinations, buttonType}) {
     super();
 
     this._state = {
@@ -173,7 +178,7 @@ export default class NewFormView extends AbstractStatefulView {
   }
 
   #setDatePickers() {
-    const { dateFrom, dateTo, id } = this._state.point;
+    const {dateFrom, dateTo, id} = this._state.point;
 
     this.#dateFromPicker = flatpickr(
       this.element.querySelector(`#event-start-time-${id}`),
@@ -225,21 +230,11 @@ export default class NewFormView extends AbstractStatefulView {
   }
 
   #setDisabled(isDisabled) {
-    this.element.querySelectorAll('input, textarea, select').forEach((el) => {
-      el.disabled = isDisabled;
+    this.element.querySelectorAll('input, button, textarea, select').forEach((element) => {
+      element.disabled = isDisabled;
     });
 
-    this.element.querySelector('.event__save-btn').disabled = isDisabled;
 
-    const rollupBtn = this.element.querySelector('.event__rollup-btn');
-    rollupBtn.disabled = false;
-    rollupBtn.removeAttribute('disabled');
-
-    const resetBtn = this.element.querySelector('.event__reset-btn');
-    resetBtn.disabled = false;
-    resetBtn.removeAttribute('disabled');
-
-    this.element.dataset.blocked = String(isDisabled);
   }
 
   #destroyDatePickers() {
@@ -258,9 +253,6 @@ export default class NewFormView extends AbstractStatefulView {
   #submitHandler = (evt) => {
     evt.preventDefault();
 
-    if (this.element.querySelector('.event__save-btn').disabled) {
-      return;
-    }
 
     const destinationInput =
       this.element.querySelector('.event__input--destination').value;
@@ -292,9 +284,6 @@ export default class NewFormView extends AbstractStatefulView {
   #closeHandler = (evt) => {
     evt.preventDefault();
 
-    if (this.element.querySelector('.event__save-btn').disabled) {
-      return;
-    }
 
     this.#handleClose();
   };
@@ -302,9 +291,6 @@ export default class NewFormView extends AbstractStatefulView {
   #deleteHandler = (evt) => {
     evt.preventDefault();
 
-    if (this.element.querySelector('.event__save-btn').disabled) {
-      return;
-    }
 
     this.#handleDelete(this._state.point);
   };
@@ -325,7 +311,7 @@ export default class NewFormView extends AbstractStatefulView {
   #handleDestinationChange = (evt) => {
     const newDestination = this.#destinations.find((destination) => destination.name === evt.target.value);
     if (newDestination) {
-      this.updateElement({ destination: newDestination });
+      this.updateElement({destination: newDestination});
     }
   };
 
@@ -340,7 +326,7 @@ export default class NewFormView extends AbstractStatefulView {
       : currentOffers.filter((id) => id !== offerId);
 
     this._setState({
-      point: { ...this._state.point, offers: nextOffers },
+      point: {...this._state.point, offers: nextOffers},
     });
   };
 
