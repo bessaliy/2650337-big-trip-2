@@ -19,14 +19,12 @@ export default class MainPresenter {
   #currentSortType = SORT_TYPES.DAY;
   #emptyMessageComponent = null;
   #newEventButton = document.querySelector('.trip-main__event-add-btn');
-  #api = null;
 
 
-  constructor({ tripElement, pointModel, filterModel, api }) {
+  constructor({ tripElement, pointModel, filterModel}) {
     this.tripElement = tripElement;
     this.pointModel = pointModel;
     this.filterModel = filterModel;
-    this.#api = api;
   }
 
   init() {
@@ -49,8 +47,6 @@ export default class MainPresenter {
       onDataChange: this.#handlePointUpdate,
       onModeChange: this.#handleModeChange,
       onPointDelete: this.#handlePointDelete,
-      canOpenForm: () => !this.#isCreating,
-      onBeforeOpen: this.#beforeOpenPointForm,
     });
 
     pointPresenter.init();
@@ -79,23 +75,17 @@ export default class MainPresenter {
   }
 
   #renderNewPointPresenter() {
-    if (!this.#newPointPresenter) {
-      this.#newPointPresenter = new NewPointPresenter({
-        container: this.#listComponent.element,
-        allOffers: this.pointModel.getAllOffers(),
-        destinations: this.pointModel.getDestinations(),
-        onDataChange: this.#handleNewPointSubmit,
-        onDestroy: this.#handleNewPointDestroy,
-      });
+    if (this.#newPointPresenter) {
+      return;
     }
+    this.#newPointPresenter = new NewPointPresenter({
+      container: this.#listComponent.element,
+      allOffers: this.pointModel.getAllOffers(),
+      destinations: this.pointModel.getDestinations(),
+      onDataChange: this.#handleNewPointSubmit,
+      onDestroy: this.#handleNewPointDestroy,
+    });
   }
-
-  #beforeOpenPointForm = () => {
-    if (this.#isCreating) {
-      this.#newPointPresenter.destroy();
-    }
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
-  };
 
   #renderBoard() {
     const points = this.#getPoints();
@@ -166,6 +156,10 @@ export default class MainPresenter {
     }));
   }
 
+  #resetAllPoints() {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  }
+
   #renderEmptyList() {
     const filterType = this.filterModel.getFilter().toUpperCase();
     const message = EMPTY_MESSAGES[filterType];
@@ -175,13 +169,11 @@ export default class MainPresenter {
   }
 
   #handlePointUpdate = async (updatedPoint) => {
-    const response = await this.#api.updatePoint(updatedPoint);
-    this.pointModel.updatePoint(response);
+    await this.pointModel.updatePoint(updatedPoint);
   };
 
   #handlePointDelete = async (point) => {
-    await this.#api.deletePoint(point);
-    this.pointModel.deletePoint(point);
+    await this.pointModel.deletePoint(point);
   };
 
   #handleModelChange = () => {
@@ -190,7 +182,10 @@ export default class MainPresenter {
   };
 
   #handleModeChange = () => {
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    if (this.#isCreating) {
+      this.#newPointPresenter.destroy();
+    }
+    this.#resetAllPoints();
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -202,7 +197,7 @@ export default class MainPresenter {
 
   #handleNewEventClick = (evt) => {
     evt.preventDefault();
-    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+    this.#resetAllPoints();
 
     if (this.#isCreating && this.#newPointPresenter) {
       this.#newPointPresenter.destroy();
@@ -229,9 +224,7 @@ export default class MainPresenter {
   };
 
   #handleNewPointSubmit = async (point) => {
-    const createdPoint = await this.#api.addPoint(point);
-    this.pointModel.addPoint(createdPoint);
-    return createdPoint;
+    await this.pointModel.addPoint(point);
   };
 
   #handleNewPointDestroy = () => {

@@ -1,19 +1,25 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createInfoTemplate({ tripTitle, datesRange, totalCost, isEmpty }) {
-  if (isEmpty) {
-    return '<section class="trip-main__trip-info trip-info"></section>';
+  let info = '';
+
+  if (!isEmpty) {
+    info = `
+      <div class="trip-info__main">
+        <h1 class="trip-info__title">${tripTitle}</h1>
+        <p class="trip-info__dates">${datesRange}</p>
+      </div>
+      <p class="trip-info__cost">
+        Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalCost}</span>
+      </p>
+    `;
   }
 
-  return `<section class="trip-main__trip-info trip-info">
-            <div class="trip-info__main">
-              <h1 class="trip-info__title">${tripTitle}</h1>
-              <p class="trip-info__dates">${datesRange}</p>
-            </div>
-            <p class="trip-info__cost">
-              Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalCost}</span>
-            </p>
-          </section>`;
+  return `
+    <section class="trip-main__trip-info trip-info">
+      ${info}
+    </section>
+  `;
 }
 export default class TripInfoView extends AbstractView {
   #data = {};

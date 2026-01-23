@@ -12,10 +12,11 @@ export default class TripInfoPresenter {
   constructor({ container, pointModel }) {
     this.#container = container;
     this.#pointModel = pointModel;
+
+    this.#pointModel.addObserver(this.#handleModelChange);
   }
 
   init() {
-    this.#pointModel.addObserver(this.#handleModelChange);
     this.#render();
   }
 

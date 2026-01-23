@@ -13,15 +13,13 @@ export default class PointPresenter {
   #handleDataChange = () => null;
   #handlePointDelete = () => null;
   #handleModeChange = () => null;
-  #handleBeforeOpen = () => null;
 
   #pointComponent = null;
   #formComponent = null;
   #mode = MODES.DEFAULT;
   #escKeydownHandler = null;
-  #canOpenForm = () => true;
 
-  constructor({ point, offers, allOffers, destination, destinations, container, onDataChange, onPointDelete, onModeChange, canOpenForm, onBeforeOpen}) {
+  constructor({ point, offers, allOffers, destination, destinations, container, onDataChange, onPointDelete, onModeChange}) {
     this.#point = point;
     this.#offers = offers;
     this.#allOffers = allOffers;
@@ -31,8 +29,6 @@ export default class PointPresenter {
     this.#handleDataChange = onDataChange;
     this.#handlePointDelete = onPointDelete;
     this.#handleModeChange = onModeChange;
-    this.#canOpenForm = canOpenForm ?? (() => true);
-    this.#handleBeforeOpen = onBeforeOpen ?? (() => {});
   }
 
 
@@ -98,8 +94,6 @@ export default class PointPresenter {
   }
 
   #handleOpenClick = () => {
-
-    this.#handleBeforeOpen();
     this.#replacePointToForm();
   };
 
@@ -124,8 +118,6 @@ export default class PointPresenter {
       this.#replaceFormToPoint();
     } catch {
       this.#formComponent.setAborting();
-
-
     }
   };
 
