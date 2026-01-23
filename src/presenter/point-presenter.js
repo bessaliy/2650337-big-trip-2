@@ -1,7 +1,7 @@
 import PointView from '../views/point-view.js';
 import NewFormView from '../views/new-form-view.js';
 import { render, replace } from '../framework/render.js';
-import {MODES} from '../const.js';
+import {MODES, BUTTON_TYPES} from '../const.js';
 
 export default class PointPresenter {
   #point = null;
@@ -77,12 +77,13 @@ export default class PointPresenter {
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleFormClose,
       onDelete: this.#handleFormDelete,
+      buttonType: BUTTON_TYPES.EXISTING_FORM,
     });
 
     replace(this.#formComponent, this.#pointComponent);
     this.#mode = MODES.EDITING;
 
-    this.#escKeydownHandler = this.#onEscKeydown.bind(this);
+    this.#escKeydownHandler = this.#escPressHandler.bind(this);
     document.addEventListener('keydown', this.#escKeydownHandler);
   }
 
@@ -96,13 +97,17 @@ export default class PointPresenter {
     this.#replacePointToForm();
   };
 
-  #handleFavoriteClick = () => {
+  #handleFavoriteClick = async () => {
     const updatedPoint = {
       ...this.#point,
       isFavorite: !this.#point.isFavorite
     };
 
-    this.#handleDataChange?.(updatedPoint);
+    try {
+      await this.#handleDataChange(updatedPoint);
+    } catch {
+      this.#pointComponent.shake();
+    }
   };
 
   #handleFormSubmit = async (updatedPoint) => {
@@ -130,7 +135,7 @@ export default class PointPresenter {
     }
   };
 
-  #onEscKeydown(evt) {
+  #escPressHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.#replaceFormToPoint();

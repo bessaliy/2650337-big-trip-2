@@ -1,44 +1,51 @@
 import NewFormView from '../views/new-form-view.js';
 import {render, remove} from '../framework/render.js';
-import {emptyPoint} from '../const.js';
+import {EMPTY_POINT, BUTTON_TYPES} from '../const.js';
 
 export default class NewPointPresenter {
   #container = null;
   #destinations = [];
   #allOffers = null;
-  #api = null;
-  #pointModel = null;
 
-  #handleDataChange = () => {};
-  #handleDestroy = () => {};
+  #handleDataChange = () => {
+  };
+
+  #destroyHandler = () => {
+  };
 
   #formComponent = null;
 
-  constructor({ container, destinations, allOffers, onDataChange, onDestroy, api, pointModel }) {
+  constructor({container, destinations, allOffers, onDataChange, onDestroy}) {
     this.#container = container;
     this.#destinations = destinations;
     this.#allOffers = allOffers;
     this.#handleDataChange = onDataChange;
-    this.#handleDestroy = onDestroy;
-    this.#api = api;
-    this.#pointModel = pointModel;
+    this.#destroyHandler = onDestroy;
   }
 
   init() {
 
+    const emptyPoint = {
+      ...EMPTY_POINT,
+      id: crypto.randomUUID(),
+      destination: '',
+      offers: [],
+    };
+
     this.#formComponent = new NewFormView({
       point: emptyPoint,
-      destination: this.#destinations[0],
+      destination: null,
       allOffers: this.#allOffers,
       destinations: this.#destinations,
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleFormCancel,
       onDelete: this.#handleFormCancel,
+      buttonType: BUTTON_TYPES.NEW_FORM,
     });
 
     render(this.#formComponent, this.#container, 'afterbegin');
 
-    document.addEventListener('keydown', this.#onEscKeydown);
+    document.addEventListener('keydown', this.#escKeydownHandler);
   }
 
   destroy() {
@@ -49,19 +56,24 @@ export default class NewPointPresenter {
     remove(this.#formComponent);
     this.#formComponent = null;
 
-    document.removeEventListener('keydown', this.#onEscKeydown);
-    this.#handleDestroy();
+    document.removeEventListener('keydown', this.#escKeydownHandler);
+    this.#destroyHandler();
   }
 
   #handleFormSubmit = async (point) => {
+
+
     this.#formComponent.setSaving();
 
     try {
-      const createdPoint = await this.#api.addPoint(point);
-      this.#pointModel.addPoint(createdPoint);
+      await this.#handleDataChange(point);
+
+
       this.destroy();
     } catch {
       this.#formComponent.setAborting();
+
+
     }
   };
 
@@ -69,7 +81,7 @@ export default class NewPointPresenter {
     this.destroy();
   };
 
-  #onEscKeydown = (evt) => {
+  #escKeydownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.destroy();
